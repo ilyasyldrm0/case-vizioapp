@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import type { PostWithTeam } from "@/types/database";
 
 export async function createPost(formData: FormData) {
   const supabase = await createClient();
@@ -30,4 +31,29 @@ export async function deletePost(postId: string) {
   if (error) return { error: error.message };
   revalidatePath("/feed");
   return { success: true };
+}
+
+const PAGE_SIZE = 8;
+
+export async function fetchMorePosts({
+  lastCreatedAt,
+}: {
+  lastCreatedAt: string | null;
+}) {
+  const supabase = await createClient();
+  let q = supabase
+    .from("posts")
+    .select("*, teams(name, slug)")
+    .order("created_at", { ascending: false })
+    .limit(PAGE_SIZE);
+  if (lastCreatedAt) q = q.lt("created_at", lastCreatedAt);
+
+  const { data } = await q;
+  const posts = (data ?? []) as PostWithTeam[];
+
+  return {
+    posts,
+    lastCreatedAt: posts.length > 0 ? posts[posts.length - 1].created_at : lastCreatedAt,
+    hasMore: posts.length === PAGE_SIZE,
+  };
 }

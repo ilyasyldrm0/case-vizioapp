@@ -1,12 +1,14 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { createPost } from "@/app/actions/posts";
 
 export default function PostForm() {
   const formRef            = useRef<HTMLFormElement>(null);
   const [error, setError]  = useState<string | null>(null);
   const [isPending, start] = useTransition();
+  const router             = useRouter();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -18,6 +20,7 @@ export default function PostForm() {
         setError(result.error);
       } else {
         formRef.current?.reset();
+        router.refresh();
       }
     });
   }
