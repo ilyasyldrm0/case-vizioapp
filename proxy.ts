@@ -36,8 +36,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/feed", request.url));
   }
 
-  // Giriş yapılmış kullanıcı: onboarding tamamlanmamışsa /onboarding'e yönlendir
-  if (user && !isAuthPage && !isOnboardingPage) {
+  // Giriş yapılmış kullanıcı: onboarding durumunu kontrol et
+  if (user && !isAuthPage) {
     const { data: profile } = await supabase
       .from("profiles")
       .select("username, team_id")
@@ -45,8 +45,15 @@ export async function proxy(request: NextRequest) {
       .maybeSingle();
 
     const needsOnboarding = !profile?.username || !profile?.team_id;
-    if (needsOnboarding) {
+
+    // Onboarding tamamlanmamış → /onboarding'e yönlendir
+    if (needsOnboarding && !isOnboardingPage) {
       return NextResponse.redirect(new URL("/onboarding", request.url));
+    }
+
+    // Onboarding zaten tamamlanmış → /onboarding'e erişimi engelle
+    if (!needsOnboarding && isOnboardingPage) {
+      return NextResponse.redirect(new URL("/feed", request.url));
     }
   }
 

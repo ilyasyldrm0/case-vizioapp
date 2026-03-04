@@ -111,68 +111,26 @@ A `SECURITY DEFINER` SQL function that resolves the current user's `team_id` fro
 
 ## Key Assumptions & Trade-offs
 
-### Onboarding page instead of inline signup flow
+1.Onboarding page instead of inline signup flow
 
-The PDF suggests creating a team during signup. I chose to separate this into a dedicated `/onboarding` page. This keeps the auth flow clean (signup = create account only) and works identically for email/password and Google OAuth without special-casing either path.
+2.Middleware performs a DB query on every request, gives more speed but less optimization
 
-### Middleware performs a DB query on every request
+3.Follow system is team-to-team, not user-to-team, cant collect more data
 
-To detect whether a logged-in user has completed onboarding, the middleware queries `profiles` on every non-auth page request. This is acceptable for an MVP but would not scale well. In production, this would be replaced with a **JWT custom claim** (`onboarding_complete: true`) injected at login time via a Supabase Auth Hook, eliminating the per-request DB round-trip entirely.
-
-### No `author_user_id` on posts
-
-Posts are attributed to a team, not a user. This is a deliberate product decision aligned with the spec. The trade-off is that there is no audit trail of which team member created a post. If needed, adding `author_user_id uuid REFERENCES auth.users` to `posts` would be straightforward without breaking existing data or RLS logic.
-
-### Follow system is team-to-team, not user-to-team
-
-A user's follow actions affect their entire team. If user A and user B are on the same team, they share the same follow list. This is consistent with the team-as-identity model but means individual members cannot have independent social graphs.
-
-### No RLS test coverage
-
-The RLS policies are manually verified but not unit tested. In a production environment, [pgTAP](https://pgtap.org/) would be used to write automated tests asserting, for example, that a user cannot delete another team's post even with a direct SQL call.
-
-### Search uses `ILIKE`, not full-text search
-
-Team search on the onboarding page uses `ILIKE '%query%'`. This is simple and correct for small datasets. At scale, enabling the `pg_trgm` PostgreSQL extension would provide fuzzy matching and significantly better search performance via GIN indexes.
+4.Search uses `ILIKE`, not full-text search
 
 ---
 
 ## What I Would Improve With More Time
 
-1. **JWT custom claims for onboarding state** — Remove the per-request DB query in middleware. Inject `onboarding_complete` into the JWT at login via a Supabase Auth Hook.
+1.JWT custom claims for onboarding state
 
-2. **pgTAP RLS tests** — Write automated tests for every RLS policy to catch regressions when schema changes.
+2.pgTAP RLS tests
 
-3. **Optimistic UI updates** — The follow button currently waits for the server action to resolve before updating. With `useOptimistic`, the UI can update instantly and roll back on error.
+3.Optimistic UI updates
 
-4. **Pagination on the feed** — Currently limited to 50 posts with `.limit(50)`. Cursor-based pagination (using `created_at` as cursor) would be the right approach at scale.
+4.Rate limiting on post creation & DB query optimization
 
-5. **Team invitation system** — Right now any user can join any team by searching for it. A proper invitation flow (invite link or email-based) would be more secure and realistic.
-
-6. **Rate limiting on post creation** — No rate limiting exists. A Supabase Edge Function or middleware-level check could enforce a per-team post rate limit.
-
-7. **ERD and architecture diagram in README** — A visual schema diagram would make the data model easier to communicate during code review.
+5.Logging,Monitoring & Algorithmic Feed
 
 ---
-
-## Project Structure
-
-```
-app/
-├── (auth)/          # Login, signup pages
-├── (app)/           # Authenticated pages
-│   ├── feed/        # Global feed
-│   ├── onboarding/  # Username + team setup
-│   └── teams/[slug] # Team profile page
-├── actions/         # Server actions (auth, posts, follows, onboarding)
-└── auth/callback/   # OAuth callback handler
-
-components/
-└── features/        # PostCard, PostForm, FollowButton, TeamCard, UnfollowButton
-
-lib/
-└── supabase/        # Browser + server Supabase clients
-
-types/
-└── database.ts      # Type definitions matching Supabase schema
-```
