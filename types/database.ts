@@ -60,9 +60,12 @@ export interface Database {
         ];
       };
     };
+    Views:         { [_ in never]: never };
     Functions: {
       my_team_id: { Args: Record<never, never>; Returns: string | null };
     };
+    Enums:         { [_ in never]: never };
+    CompositeTypes: { [_ in never]: never };
   };
 }
 
