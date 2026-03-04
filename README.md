@@ -111,26 +111,30 @@ A `SECURITY DEFINER` SQL function that resolves the current user's `team_id` fro
 
 ## Key Assumptions & Trade-offs
 
-1.Onboarding page instead of inline signup flow
+1.Onboarding page instead of inline signup flow. (improves UX for both email/password and Google OAuth)
 
-2.Middleware performs a DB query on every request, gives more speed but less optimization
+2.Middleware performs a DB query on every request, gives more speed but less optimization. (can be improved with JWT custom claims)
 
-3.Follow system is team-to-team, not user-to-team, cant collect more data
+3.Follow system is team-to-team, not user-to-team, cant collect more data which is neeeded for algorithmic feed.
 
-4.Search uses `ILIKE`, not full-text search
+4.Search uses `ILIKE`, not full-text search (can be improved with pg_trgm)
 
 ---
 
 ## What I Would Improve With More Time
 
-1.JWT custom claims for onboarding state
+1. JWT custom claims for onboarding state (eliminates per-request DB round-trip)
 
-2.pgTAP RLS tests
+2. pgTAP RLS tests (for RLS policies)
 
-3.Optimistic UI updates
+3. Optimistic UI updates (for better UX)
 
-4.Rate limiting on post creation & DB query optimization
+4. Rate limiting on post creation & DB query optimization (for better performance)
 
-5.Logging,Monitoring & Algorithmic Feed
+5. Logging,Monitoring & Algorithmic Feed (for better user experience and performance)
+
+6. Feed algorithm can be improved all over.
+
+Note: Forgot to tell you on video article 4 and 6.
 
 ---
