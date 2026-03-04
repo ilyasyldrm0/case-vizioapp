@@ -6,6 +6,28 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  let username: string | null = null;
+  let teamSlug: string | null = null;
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("username, team_id")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    username = profile?.username ?? null;
+
+    if (profile?.team_id) {
+      const { data: team } = await supabase
+        .from("teams")
+        .select("slug")
+        .eq("id", profile.team_id)
+        .maybeSingle();
+      teamSlug = team?.slug ?? null;
+    }
+  }
+
   return (
     <div style={{ minHeight: "100vh", background: "#0a0a0a", color: "#f0ede6" }}>
       {/* Nav */}
@@ -19,22 +41,59 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </span>
 
         {user ? (
-          /* Giriş yapılmış → Çıkış butonu */
-          <form action={signOut}>
-            <button
-              type="submit"
-              style={{
-                fontSize: 13,
-                color: "rgba(240,237,230,0.5)",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: "4px 8px",
-              }}
-            >
-              Çıkış
-            </button>
-          </form>
+          /* Giriş yapılmış → kullanıcı adı + Çıkış */
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            {username && (
+              teamSlug ? (
+                <Link
+                  href={`/teams/${teamSlug}`}
+                  style={{
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: "rgba(240,237,230,0.75)",
+                    fontFamily: "var(--font-mono)",
+                    textDecoration: "none",
+                    padding: "4px 12px",
+                    borderRadius: 999,
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    background: "rgba(255,255,255,0.04)",
+                    letterSpacing: "0.01em",
+                  }}
+                >
+                  @{username}
+                </Link>
+              ) : (
+                <span style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "rgba(240,237,230,0.75)",
+                  fontFamily: "var(--font-mono)",
+                  padding: "4px 12px",
+                  borderRadius: 999,
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  background: "rgba(255,255,255,0.04)",
+                  letterSpacing: "0.01em",
+                }}>
+                  @{username}
+                </span>
+              )
+            )}
+            <form action={signOut}>
+              <button
+                type="submit"
+                style={{
+                  fontSize: 13,
+                  color: "rgba(240,237,230,0.4)",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: "4px 8px",
+                }}
+              >
+                Çıkış
+              </button>
+            </form>
+          </div>
         ) : (
           /* Giriş yapılmamış → Giriş Yap / Kaydol butonları */
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
