@@ -78,6 +78,8 @@ Sign up / Log in
 | `posts`        | Team-owned text posts (1–500 chars)                                                             |
 | `team_follows` | Directional follow relationship between teams                                                   |
 
+![Screenshot, visual schema of DB](ss-db-schema.png)
+
 ### Key Design Decisions
 
 **`profiles.team_id` is nullable until onboarding is complete.**
