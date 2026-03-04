@@ -6,11 +6,12 @@ import { followTeam, unfollowTeam } from "@/app/actions/follows";
 
 interface Props {
   targetTeamId: string;
+  targetTeamSlug: string;
   initiallyFollowing: boolean;
   isLoggedIn?: boolean;
 }
 
-export default function FollowButton({ targetTeamId, initiallyFollowing, isLoggedIn = true }: Props) {
+export default function FollowButton({ targetTeamId, targetTeamSlug, initiallyFollowing, isLoggedIn = true }: Props) {
   const [following, setFollowing] = useState(initiallyFollowing);
   const [isPending, start]        = useTransition();
   const router = useRouter();
@@ -26,8 +27,11 @@ export default function FollowButton({ targetTeamId, initiallyFollowing, isLogge
     }
     start(async () => {
       const action = following ? unfollowTeam : followTeam;
-      const result = await action(targetTeamId);
-      if (!result?.error) setFollowing(!following);
+      const result = await action(targetTeamId, targetTeamSlug);
+      if (!result?.error) {
+        setFollowing(!following);
+        router.refresh();
+      }
     });
   }
 

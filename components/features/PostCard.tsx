@@ -37,6 +37,7 @@ export default function PostCard({ post, myTeamId, followedTeamIds = [] }: Props
         {!isOwnTeam && (
           <FollowButton
             targetTeamId={post.team_id}
+            targetTeamSlug={post.teams.slug}
             initiallyFollowing={isFollowing}
             isLoggedIn={!!myTeamId}
           />

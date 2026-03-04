@@ -105,6 +105,7 @@ export default async function TeamPage({ params }: Props) {
             {!isOwnTeam && (
               <FollowButton
                 targetTeamId={team.id}
+                targetTeamSlug={team.slug}
                 initiallyFollowing={isFollowing}
               />
             )}

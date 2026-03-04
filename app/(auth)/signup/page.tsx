@@ -110,7 +110,7 @@ export default function SignupPage() {
                 </button>
 
                 <p className="text-xs text-center font-mono text-[#f0ede640]">
-                  Kaydolunca otomatik bir takım profili oluşturulur.
+                  Takım bilgileri bir sonraki ekranda sorulur.
                 </p>
               </form>
             </>

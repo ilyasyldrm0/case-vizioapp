@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
-export async function followTeam(targetTeamId: string) {
+export async function followTeam(targetTeamId: string, targetTeamSlug: string) {
   const supabase = await createClient();
   const { data: myTeamId } = await supabase.rpc("my_team_id");
   if (!myTeamId) return { error: "Takımın bulunamadı." };
@@ -15,12 +15,12 @@ export async function followTeam(targetTeamId: string) {
 
   if (error) return { error: error.message };
 
-  revalidatePath(`/teams/${targetTeamId}`);
+  revalidatePath(`/teams/${targetTeamSlug}`);
   revalidatePath("/feed");
   return { success: true };
 }
 
-export async function unfollowTeam(targetTeamId: string) {
+export async function unfollowTeam(targetTeamId: string, targetTeamSlug: string) {
   const supabase = await createClient();
   const { data: myTeamId } = await supabase.rpc("my_team_id");
   if (!myTeamId) return { error: "Takımın bulunamadı." };
@@ -32,7 +32,7 @@ export async function unfollowTeam(targetTeamId: string) {
 
   if (error) return { error: error.message };
 
-  revalidatePath(`/teams/${targetTeamId}`);
+  revalidatePath(`/teams/${targetTeamSlug}`);
   revalidatePath("/feed");
   return { success: true };
 }
