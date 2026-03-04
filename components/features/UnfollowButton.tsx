@@ -1,14 +1,17 @@
 "use client";
 
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { unfollowTeam } from "@/app/actions/follows";
 
-export default function UnfollowButton({ targetTeamId }: { targetTeamId: string }) {
+export default function UnfollowButton({ targetTeamId, targetTeamSlug }: { targetTeamId: string; targetTeamSlug: string }) {
   const [isPending, start] = useTransition();
+  const router = useRouter();
 
   function handleUnfollow() {
     start(async () => {
-      await unfollowTeam(targetTeamId);
+      await unfollowTeam(targetTeamId, targetTeamSlug);
+      router.refresh();
     });
   }
 
