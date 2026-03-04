@@ -2,6 +2,8 @@
 
 A team-based social media platform built with **Next.js 15 (App Router)** and **Supabase**. Teams are the first-class identity — there are no individual user profiles. All posts, follows, and social actions are performed under a team identity.
 
+Live on: https://case-vizioapp.vercel.app/
+
 ---
 
 ## Setup Instructions
