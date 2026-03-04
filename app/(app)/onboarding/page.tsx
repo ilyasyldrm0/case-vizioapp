@@ -57,8 +57,8 @@ export default function OnboardingPage() {
   // Takım arama debounce
   useEffect(() => {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
-    setSelectedTeam(null);
     if (!searchQuery.trim()) { setSearchResults([]); return; }
+    setSelectedTeam(null);
 
     searchTimeout.current = setTimeout(async () => {
       const results = await searchTeams(searchQuery);
@@ -195,7 +195,7 @@ export default function OnboardingPage() {
                   disabled={isPending}
                 />
                 <p style={{ fontSize: 11, marginTop: 5, color: "rgba(240,237,230,0.35)", fontFamily: "var(--font-mono)" }}>
-                  viziosocial.com/teams/{teamSlug || "..."}
+                  case-vizioapp.vercel.app/teams/{teamSlug || "..."}
                 </p>
               </div>
             </div>
