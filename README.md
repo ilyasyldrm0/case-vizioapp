@@ -135,6 +135,8 @@ A `SECURITY DEFINER` SQL function that resolves the current user's `team_id` fro
 
 6. Feed algorithm can be improved all over.
 
-Note: Forgot to tell you on video article 4 and 6.
+7. Add updated_at column to all tables.
+
+Note: Forgot to tell you on video article 4,6 and 7.
 
 ---
